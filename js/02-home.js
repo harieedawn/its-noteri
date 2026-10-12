@@ -8,7 +8,7 @@
 const idb=new Promise((r,j)=>{const q=indexedDB.open('noteri',1);q.onupgradeneeded=()=>q.result.createObjectStore('k');q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)});
 const tx=async(m,f)=>{const d=await idb;return new Promise((res,rej)=>{const t=d.transaction('k',m),q=f(t.objectStore('k'));t.oncomplete=()=>res(q.result);t.onerror=()=>rej(q.error||t.error);t.onabort=()=>rej(t.error||q.error||new Error('abort'))})};
 const get=k=>tx('readonly',s=>s.get(k)),put=(k,v)=>tx('readwrite',s=>s.put(v,k)),del=k=>tx('readwrite',s=>s.delete(k));
-if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let pdfP=null;const pdfEnsure=()=>{const W='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc=W+'pdf.worker.min.js';return Promise.resolve(true)}return pdfP||(pdfP=new Promise(r=>{const s=document.createElement('script');s.src=W+'pdf.min.js';s.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc=W+'pdf.worker.min.js';r(true)};s.onerror=()=>{pdfP=null;s.remove();r(false)};document.head.appendChild(s)}))};
 let M={folders:[],docs:[]},cur=null,q='',S=null,pdf=null,stylus=false;
 const sv=()=>put('meta',M);
 /* ui helpers */

@@ -34,3 +34,7 @@ const norm=s=>(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/�
 const lum=c=>{const n=parseInt(c.slice(1),16);return(.299*(n>>16)+.587*(n>>8&255)+.114*(n&255))/255};
 /* font: đo lại chiều cao chữ/nút khi Google Sans tải xong */
 if(document.fonts){document.fonts.load('400 16px "Google Sans"');document.fonts.load('700 16px "Google Sans"');document.fonts.ready.then(()=>{if(S){renderObjs();req()}})}
+/* DPR hiệu dụng: ≤2 (≤1.5 máy yếu), và tổng điểm ảnh canvas ≤16 triệu */
+const LOWEND=(navigator.hardwareConcurrency||8)<=4||(navigator.deviceMemory||8)<=4;
+function DPR(w,h){let d=Math.min(devicePixelRatio||1,LOWEND?1.5:2);if(w&&h&&w*h*d*d>16e6)d=Math.sqrt(16e6/(w*h));return d}
+if(LOWEND)document.documentElement.classList.add('lo');

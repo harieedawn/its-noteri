@@ -22,7 +22,7 @@ function xProg(title,ind){const bar=h('i'),box=h('div',{class:'xpb'+(ind?' ind':
 /* ---------- ảnh PNG / PDF của trang, giấy note, ảnh, PDF ---------- */
 async function xLoad(d){let c=await get('d:'+d.id);c=typeof c==='string'?JSON.parse(c):c||{};
  const E={d,pdf:d.type==='pdf',img:d.type==='image',strokes:c.strokes||[],objs:c.objs||[],edges:c.edges||[],paper:c.paper||d.paper||'#ffffff',pattern:c.pattern||d.pattern,sp:c.sp||d.sp,imgs:new Map(),sheets:[],doc:null,base:null};
- if(E.pdf){if(!window.pdfjsLib)throw{msg:'Cần kết nối mạng một lần để tải bộ đọc PDF.'};E.doc=await pdfOpen(await get('p:'+d.id));const rs=await pdfRat(d.id,E.doc);let y=0;for(const r of rs){const hh=SW*r;E.sheets.push({y,h:hh});y+=hh+48}E.W=SW;E.H=y-48}
+ if(E.pdf){if(!await pdfEnsure())throw{msg:'Cần kết nối mạng một lần để tải bộ đọc PDF.'};E.doc=await pdfOpen(await get('p:'+d.id));const rs=await pdfRat(d.id,E.doc);let y=0;for(const r of rs){const hh=SW*r;E.sheets.push({y,h:hh});y+=hh+48}E.W=SW;E.H=y-48}
  else if(E.img){E.base=await createImageBitmap(await get('i:'+d.id));E.W=c.cw||E.base.width;E.H=c.fh||c.ch||E.base.height}
  else{const[a,b]=RAT[c.ratio||d.ratio]||[3,4],k=2400/Math.max(a,b);E.W=a*k;E.H=b*k}
  for(const o of E.objs)if(o.k==='img'&&o.src){const im=new Image();im.src=o.src;try{await im.decode()}catch(e){}E.imgs.set(o.id,im)}
@@ -99,7 +99,7 @@ async function runExport(d,s){const P=xProg('Đang xuất…',1);let E=null;
  catch(e){if(e&&e.cancel)return;closeM();alert(e&&e.msg||'Không xuất được. Thiết bị có thể thiếu bộ nhớ hoặc tệp bị hỏng.')}
  finally{xFree(E)}}
 async function xSheet(d){const pd=d.type==='pdf';let N=1;
- if(pd){if(!window.pdfjsLib)return alert('Cần kết nối mạng một lần để tải bộ đọc PDF.');
+ if(pd){if(!await pdfEnsure())return alert('Cần kết nối mạng một lần để tải bộ đọc PDF.');
   try{let r=null;try{r=await get('r:'+d.id)}catch(e){}if(Array.isArray(r)&&r.length)N=r.length;else{const t=await pdfOpen(await get('p:'+d.id));N=t.numPages;t.destroy().catch(()=>{})}}catch(e){return alert('Không đọc được PDF này.')}}
  const st={fmt:pd?'pdf':'png',sc:'in',rg:'all',a:1,b:N,pg:1},body=h('div'),what=pd?'trang PDF':d.type==='image'?'ảnh':'trang',
  fix=k=>{let v=Math.round(+st[k]);if(!(v>=1))v=1;if(v>N)v=N;st[k]=v},

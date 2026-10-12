@@ -6,7 +6,7 @@
 /* PDF: dựng lười theo vùng nhìn. Trang đang xem dựng trước (gần giữa màn hình nhất), kèm vài trang liền kề theo hướng cuộn; trang trôi xa thì hủy và giải phóng; cuộn nhanh thì hoãn. Mọi lời gọi vào bộ đọc đều có thời hạn: kẹt thì nạp lại tài liệu. */
 const PB=Math.round(Math.min(56e6,Math.max(20e6,(navigator.deviceMemory||4)*9e6))),THB=PB*.25,PA=2,CN=2;
 const tmo=(p,ms)=>new Promise((res,rej)=>{const t=setTimeout(()=>rej({tmo:1}),ms);p.then(v=>{clearTimeout(t);res(v)},e=>{clearTimeout(t);rej(e)})});
-const pdfOpen=buf=>pdfjsLib.getDocument({data:new Uint8Array(buf),verbosity:0}).promise;
+const pdfOpen=async buf=>{if(!await pdfEnsure())throw new Error('pdfjs');return pdfjsLib.getDocument({data:new Uint8Array(buf),verbosity:0}).promise};
 async function pdfRat(id,d){let c=null;try{c=await get('r:'+id)}catch(e){}const n=d.numPages;if(Array.isArray(c)&&c.length===n&&c.every(r=>r>0))return c;
  const rs=[];let lr=1.4142,bad=0;for(let i=0;i<n;i+=12){const b=await Promise.all(Array.from({length:Math.min(12,n-i)},(_,j)=>tmo(d.getPage(i+j+1),20000).then(p=>{const v=p.getViewport({scale:1});p.cleanup();return v.width>0?v.height/v.width:0}).catch(()=>0)));for(const r of b){if(r>0)lr=r;else bad=1;rs.push(r>0?r:lr)}if(n>24)snack('Đang mở PDF… '+Math.min(i+12,n)+'/'+n)}
  if(!bad)try{await put('r:'+id,rs)}catch(e){}return rs}
@@ -31,7 +31,7 @@ function pump(a,b){const SS=S;if(!pdf)return;const now=performance.now(),s=SS.tr
  if(SS.rl||SS.cln)return;if(SS.tot>PB)evict(a,b);
  if(SS.sp>1){wk(SS,120);return}
  if(SS.busyN===0&&SS.nr>=(SS.sp>.3?30:8)){pdfClean();return}
- const pn=g&&g.m==='pinch',zw=Math.max(600,Math.ceil(SW*s*(devicePixelRatio||1)/200)*200),C=[];
+ const pn=g&&g.m==='pinch',zw=Math.max(600,Math.ceil(SW*s*DPR()/200)*200),C=[];
  for(let i=a;i<=b;i++)C.push(i);C.sort((p,q)=>{const P=SS.sheets[p],Q=SS.sheets[q];return Math.abs(P.y+P.h/2-cy)-Math.abs(Q.y+Q.h/2-cy)});const nv=C.length;
  if(SS.sp<.35){const d=SS.dr;for(let k=1;k<=PA;k++)C.push(d>0?b+k:a-k);C.push(d>0?a-1:b+1)}
  for(let n=0;n<C.length&&SS.busyN<CN;n++){const i=C[n];if(i<0||i>=N)continue;const sh=SS.sheets[i],pre=n>=nv;

@@ -123,7 +123,7 @@ function recorder(){const R=RC={st:'idle',stream:null,ctx:null,an:null,buf:null,
  bDel.onclick=()=>{if(R.st!=='lock'&&R.st!=='rev')return;if(R.dur>=5&&!confirm('Xóa bản ghi này?'))return;reset()};
  bPv.onclick=async()=>{if(R.st!=='lock'||R.busy)return;R.busy=1;await fin();R.busy=0;if(R.gone)return;if(!ok())return reset();R.st='rev';ui()};
  modal(wrap);ui();warm()}
-$('#pdfin').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;if(!window.pdfjsLib)return alert('Cần kết nối mạng một lần để tải bộ đọc PDF.');
+$('#pdfin').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;if(!await pdfEnsure())return alert('Cần kết nối mạng một lần để tải bộ đọc PDF.');
  let id,k=0;try{const buf=await f.arrayBuffer();id=uid();await put('p:'+id,buf);const t=await pdfOpen(buf);await pdfRat(id,t);t.destroy().catch(()=>{});M.docs.push({id,name:f.name.replace(/\.pdf$/i,''),type:'pdf',folder:cur,updated:Date.now(),paper:'#ffffff',txt:''});k=1;await put('d:'+id,JSON.stringify({strokes:[],objs:[]}));await sv();open(id)}catch(x){if(id&&!k){del('p:'+id);del('r:'+id)}alert('Không mở được PDF này (tệp hỏng hoặc có mật khẩu).')}};
 
 const decImg=async f=>{try{return await createImageBitmap(f,{imageOrientation:'from-image'})}catch(e){}return new Promise((res,rej)=>{const u=URL.createObjectURL(f),i=new Image();i.onload=()=>{res(i);setTimeout(()=>URL.revokeObjectURL(u),3e4)};i.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('img'))};i.src=u})};
