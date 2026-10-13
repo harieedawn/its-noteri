@@ -424,3 +424,7 @@ html.lo header,html.lo #top,html.lo #tools,html.lo #pop,html.lo #bar,html.lo #pg
 #tools.tv.tvl .ib.on{transform:translateX(4px) scale(1.04)}#tools.tv.tvr .ib.on{transform:translateX(-4px) scale(1.04)}
 #ed:has(#tools.tvl) #pop,#ed:has(#tools.tvl) #bar{left:60px}#ed:has(#tools.tvr) #pop,#ed:has(#tools.tvr) #bar{right:60px}
 }
+/* chấm màu dưới biểu tượng Bút và Bút dạ: đẩy biểu tượng lên để chấm nằm hẳn bên dưới, không đè lên nét vẽ */
+#tools .ib[data-k=pen] svg,#tools .ib[data-k=hl] svg{translate:0 -3px}
+@media(max-height:520px) and (orientation:landscape){#tools .ib .dot{width:6px;height:6px;margin-left:-3px;bottom:2px}}
+
