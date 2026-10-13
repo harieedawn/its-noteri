@@ -8,7 +8,7 @@ const pgi=$('#pgi'),stage=$('#stage'),c0=$('#c0'),c1=$('#c1'),x0=c0.getContext('
 const obj=id=>S&&S.objs.find(o=>o.id===id),req=()=>{if(S&&!S.raf)S.raf=requestAnimationFrame(draw)};
 const rep=(k,v)=>k==='b'||k==='dim'||k==='nw'||k==='src'?undefined:v,repS=(k,v)=>k==='b'||k==='dim'||k==='nw'?undefined:v;
 const ser=()=>({s:S.strokes.slice(),o:JSON.stringify(S.objs,rep),e:JSON.stringify(S.edges)});
-function load(d){S.strokes=d.s.slice();S.strokes.forEach(s=>s.dim=0);S.objs=JSON.parse(d.o);S.edges=JSON.parse(d.e||'[]');if(S.selE&&!S.edges.some(e=>e.id===S.selE))S.selE=null;S.objs.forEach(o=>{if(o.k==='img')o.src=S.imgs.get(o.id)});S.inkV++;if(!obj(S.sel))S.sel=null;renderObjs();bar();dirty();updUR();req()}
+function load(d){S.lq=null;S.lp=null;S.strokes=d.s.slice();S.strokes.forEach(s=>s.dim=0);S.objs=JSON.parse(d.o);S.edges=JSON.parse(d.e||'[]');if(S.selE&&!S.edges.some(e=>e.id===S.selE))S.selE=null;S.objs.forEach(o=>{if(o.k==='img')o.src=S.imgs.get(o.id)});S.inkV++;if(!obj(S.sel))S.sel=null;renderObjs();bar();dirty();updUR();req()}
 const touch=()=>{if(!S.pre)S.pre=ser()};
 function commit(){if(S.pre){S.hist.push(S.pre);if(S.hist.length>200)S.hist.shift();S.fut=[];S.pre=null;dirty();updUR()}}
 const undo=()=>{if(!S)return;if(S.edit&&endEdit()===true)return;if(!S.hist.length)return;S.fut.push(ser());load(S.hist.pop());hap()},redo=()=>{if(!S)return;if(S.edit&&endEdit()===true)return;if(!S.fut.length)return;S.hist.push(ser());load(S.fut.pop());hap()};

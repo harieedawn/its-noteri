@@ -6,7 +6,9 @@
 /* PDF: dựng lười theo vùng nhìn. Trang đang xem dựng trước (gần giữa màn hình nhất), kèm vài trang liền kề theo hướng cuộn; trang trôi xa thì hủy và giải phóng; cuộn nhanh thì hoãn. Mọi lời gọi vào bộ đọc đều có thời hạn: kẹt thì nạp lại tài liệu. */
 const PB=Math.round(Math.min(56e6,Math.max(20e6,(navigator.deviceMemory||4)*9e6))),THB=PB*.25,PA=2,CN=2;
 const tmo=(p,ms)=>new Promise((res,rej)=>{const t=setTimeout(()=>rej({tmo:1}),ms);p.then(v=>{clearTimeout(t);res(v)},e=>{clearTimeout(t);rej(e)})});
-const pdfOpen=async buf=>{if(!await pdfEnsure())throw new Error('pdfjs');return pdfjsLib.getDocument({data:new Uint8Array(buf),verbosity:0}).promise};
+/* Phông chuẩn và CMap cho PDF không nhúng phông (vd. đổi từ docx); lỗi mạng thì pdf.js tự lùi */
+const PDFO={cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',cMapPacked:true,standardFontDataUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/',useSystemFonts:true};
+const pdfOpen=async buf=>{if(!await pdfEnsure())throw new Error('pdfjs');return pdfjsLib.getDocument({data:new Uint8Array(buf),verbosity:0,...PDFO}).promise};
 async function pdfRat(id,d){let c=null;try{c=await get('r:'+id)}catch(e){}const n=d.numPages;if(Array.isArray(c)&&c.length===n&&c.every(r=>r>0))return c;
  const rs=[];let lr=1.4142,bad=0;for(let i=0;i<n;i+=12){const b=await Promise.all(Array.from({length:Math.min(12,n-i)},(_,j)=>tmo(d.getPage(i+j+1),20000).then(p=>{const v=p.getViewport({scale:1});p.cleanup();return v.width>0?v.height/v.width:0}).catch(()=>0)));for(const r of b){if(r>0)lr=r;else bad=1;rs.push(r>0?r:lr)}if(n>24)snack('Đang mở PDF… '+Math.min(i+12,n)+'/'+n)}
  if(!bad)try{await put('r:'+id,rs)}catch(e){}return rs}
