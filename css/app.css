@@ -410,15 +410,17 @@ html.lo header,html.lo #top,html.lo #tools,html.lo #pop,html.lo #bar,html.lo #pg
 }
 /* kéo thanh công cụ: dạng đứng khi thả sát cạnh trái/phải, ô xem trước khi kéo tới cạnh */
 #tools .ib[data-k=select]{touch-action:none;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
-#tools.tdr{box-shadow:0 18px 44px #0000003a}
-#tgh{position:absolute;z-index:5;box-sizing:border-box;border-radius:34px;background:color-mix(in srgb,var(--pr) 16%,transparent);border:2px solid color-mix(in srgb,var(--pr) 42%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);pointer-events:none;opacity:0;transition:opacity .18s ease}#tgh.on{opacity:1}
+#tools{transition:scale .4s var(--sp),box-shadow .3s ease}#tools.tdr{scale:1.07;box-shadow:0 20px 48px #00000040}
+#tgh{position:absolute;z-index:5;box-sizing:border-box;border-radius:34px;background:color-mix(in srgb,var(--pr) 16%,transparent);border:2px solid color-mix(in srgb,var(--pr) 42%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);pointer-events:none;opacity:0;scale:.9;transition:opacity .2s ease,scale .4s var(--sp)}#tgh.on{opacity:1;scale:1}
 #tools.tv{flex-direction:column;padding:7px 5px;border-radius:30px}
 #tools.tv .ib{margin:1px 0;transition:height .42s var(--ez),margin .42s var(--ez),opacity .26s ease calc(var(--n,0)*26ms),scale .5s var(--sp) calc(var(--n,0)*26ms),background .2s,color .2s}
 #tools.tv.tvl .ib.on{transform:translateX(8px) scale(1.06)}#tools.tv.tvr .ib.on{transform:translateX(-8px) scale(1.06)}
 #tools.tv.cp .ib:not([data-k=select]){width:46px!important;height:0!important;margin:0!important;opacity:0;scale:.3;pointer-events:none;visibility:hidden;transition:height .4s var(--ez),margin .4s var(--ez),opacity .14s ease,scale .3s var(--ez),visibility 0s linear .4s}
 #ed:has(#tools.tvl) #pop,#ed:has(#tools.tvl) #bar{left:76px}#ed:has(#tools.tvr) #pop,#ed:has(#tools.tvr) #bar{right:76px}
+#ed.tbn #pop,#ed.tbn #bar{bottom:calc(12px + env(safe-area-inset-bottom))!important}
 @media(max-height:520px) and (orientation:landscape){
-#tools.tv.cp .ib:not([data-k=select]){width:34px!important}
+#tools.tv.cp
+#ed.tbn #pop,#ed.tbn #bar{bottom:calc(8px + env(safe-area-inset-bottom))!important} .ib:not([data-k=select]){width:34px!important}
 #tools.tv.tvl .ib.on{transform:translateX(4px) scale(1.04)}#tools.tv.tvr .ib.on{transform:translateX(-4px) scale(1.04)}
 #ed:has(#tools.tvl) #pop,#ed:has(#tools.tvl) #bar{left:60px}#ed:has(#tools.tvr) #pop,#ed:has(#tools.tvr) #bar{right:60px}
 }
