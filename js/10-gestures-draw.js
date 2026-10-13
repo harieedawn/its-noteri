@@ -1,7 +1,7 @@
 'use strict';
 // 10-gestures-draw.js: Cử chỉ chạm, thả đối tượng, vẽ. Dòng 1152-1217 của index.html gốc.
 // Script cổ điển, dùng chung phạm vi toàn cục với các file js/ khác (thứ tự nạp theo số đầu tên file).
-// Hàm/const cấp cao: up, objDrop, tap, pgUpd, draw, P, g, mt, lastTap, ring, lqIn, lqPick, lqBox, lqHit, lqDraw, lqGhost, lqMove, lqEnd, lqRev, lqDel, lqClr
+// Hàm/const cấp cao: up, objDrop, tap, pgUpd, draw, P, g, mt, lastTap, ring, lqIn, lqPick, lqBox, lqHit, lqDraw, lqGhost, lqMove, lqEnd, lqRev, lqUng, lqDel, lqClr, hsK, hsInit, hsUpd, hsFin, hsGhost
 /* gestures */
 const P=new Map();let g=null,mt=null,lastTap={t:0,x:0,y:0,id:null};
 const ring=(x,y)=>{const r=$('#ring');if(S.tool==='erase'){r.style.cssText=`display:block;left:${x}px;top:${y}px;width:${T.er.w}px;height:${T.er.w}px`}else r.style.display='none'};
@@ -11,7 +11,7 @@ stage.addEventListener('pointerdown',e=>{SRC=null;if(!S||e.target.tagName==='TEX
  if(P.size>=2){if(g&&g.m!=='pinch'){if(g.m==='stroke'){S.live=null;S.pm=[]}else{S.guides=[];S.gh=null;if(g.m==='lasso')S.lp=null;if(g.m==='lmove')lqRev(g);if(g.m==='erase'){S.strokes.forEach(s=>s.dim=0);S.inkV++}commit()}}const[a,b]=[...P.values()];g={m:'pinch',d0:Math.hypot(a.x-b.x,a.y-b.y)||1,c0:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},t0:{...S.tr}};$('#ring').style.display='none';req();return}
  let tool=S.tool;const[wx,wy]=W2(x,y);if(e.pointerType==='pen'&&(e.buttons&32||e.button===5))tool='erase';
  if(e.pointerType==='touch'&&stylus&&T.stylus)g={m:'pan',tr0:{...S.tr}};
- else if(tool==='pen'||tool==='hl'){const k=T[tool];S.live={t:tool==='pen'?'p':'h',c:k.c,w:k.w/S.f,p:[wx,wy]};g={m:'stroke',sx:wx,sy:wy,rx:wx,ry:wy}}
+ else if(tool==='pen'||tool==='hl'){const k=T[tool];S.live={t:tool==='pen'?'p':'h',c:k.c,w:k.w/S.f,p:[wx,wy]};g={m:'stroke',sx:wx,sy:wy,rx:wx,ry:wy};if(tool==='hl')hsInit(wx,wy)}
  else if(tool==='erase'){g={m:'erase'};eraseAt(wx,wy);ring(x,y)}
  else{const ob=tool==='select'||tool==='text'||tool==='note',hd=ob&&hitHandle(x,y);let o=null,ed=null;
   if(hd){const so=obj(S.sel);g=hd[0]==='c'?{m:'conn',from:so.id,side:+hd[1]}:{m:'obj',id:so.id,mode:hd,p0:[wx,wy],o0:{...so},d0:Math.hypot(wx-so.x-so.w/2,wy-so.y-so.h/2)||1}}
@@ -27,7 +27,7 @@ stage.addEventListener('pointerdown',e=>{SRC=null;if(!S||e.target.tagName==='TEX
 stage.addEventListener('pointermove',e=>{if(!S)return;const[x,y]=sp(e),p=P.get(e.pointerId);if(S.tool==='erase'&&(p||e.pointerType==='pen'||e.pointerType==='mouse'))ring(x,y);if(!p)return;
  mt&&(mt.mv=Math.max(mt.mv,Math.hypot(x-p.x0,y-p.y0)));p.x=x;p.y=y;if(!g)return;if(g.m==='pinch'||g.m==='pan')S.mv=performance.now();
  if(g.m==='pinch'){if(P.size<2)return;const[a,b]=[...P.values()],d=Math.hypot(a.x-b.x,a.y-b.y)||1,cx=(a.x+b.x)/2,cy=(a.y+b.y)/2,t0=g.t0,s=rub(t0.s*d/g.d0),wx=(g.c0.x-t0.x)/t0.s,wy=(g.c0.y-t0.y)/t0.s;S.tr={s,x:cx-wx*s,y:cy-wy*s};clampT();S.zoomed=true}
- else if(g.m==='stroke'){const kk=1-.85*(T.stab||0);for(const ev of(e.getCoalescedEvents?e.getCoalescedEvents():[e])){const[sx,sy]=sp(ev),[wx,wy]=W2(sx,sy);g.rx=wx;g.ry=wy;g.sx+=(wx-g.sx)*kk;g.sy+=(wy-g.sy)*kk;addPt(g.sx,g.sy)}S.pm=[];if(!(T.stab>.15)&&e.getPredictedEvents)for(const ev of e.getPredictedEvents().slice(0,3)){const[sx,sy]=sp(ev),[wx,wy]=W2(sx,sy);S.pm.push(wx,wy)}}
+ else if(g.m==='stroke'){const kk=1-.85*(T.stab||0);for(const ev of(e.getCoalescedEvents?e.getCoalescedEvents():[e])){const[sx,sy]=sp(ev),[wx,wy]=W2(sx,sy);g.rx=wx;g.ry=wy;g.sx+=(wx-g.sx)*kk;g.sy+=(wy-g.sy)*kk;addPt(g.sx,g.sy)}if(g.h)hsUpd();S.pm=[];if(!(T.stab>.15)&&e.getPredictedEvents)for(const ev of e.getPredictedEvents().slice(0,3)){const[sx,sy]=sp(ev),[wx,wy]=W2(sx,sy);S.pm.push(wx,wy)}}
  else if(g.m==='erase'){for(const ev of(e.getCoalescedEvents?e.getCoalescedEvents():[e])){const[sx,sy]=sp(ev),[wx,wy]=W2(sx,sy);eraseAt(wx,wy)}}
  else if(g.m==='pan'){let nx=g.tr0.x+x-g.x0;if(straight()){const cx=(stage.clientWidth-S.W*S.tr.s)/2;nx=cx+elastic(nx-cx)}S.tr.x=nx;S.tr.y=g.tr0.y+y-g.y0;clampT();const dt=Math.max(1,e.timeStamp-g.lt);g.vx=.7*g.vx+.3*(x-g.lx)/dt;g.vy=.7*g.vy+.3*(y-g.ly)/dt;g.lx=x;g.ly=y;g.lt=e.timeStamp}
  else if(g.m==='conn'){S.cp=W2(x,y);if(g.dir){const ao=obj(g.from),T0=ao&&mmGhost(ao,S.cp[0],S.cp[1],g.pt,g),k=T0?T0.sn:-1;if(k===1&&g.k!==1)hap();g.k=k}}
@@ -38,7 +38,7 @@ stage.addEventListener('pointermove',e=>{if(!S)return;const[x,y]=sp(e),p=P.get(e
 function up(e){if(!S||!P.has(e.pointerId))return;const p=P.get(e.pointerId);P.delete(e.pointerId);const now=performance.now();
  if(g&&g.m==='pinch'){if(P.size>=2){const[a,b]=[...P.values()];g={m:'pinch',d0:Math.hypot(a.x-b.x,a.y-b.y)||1,c0:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},t0:{...S.tr}}}if(!P.size){if(mt.n>=2&&now-mt.t0<350&&mt.mv<14)mt.n>=3?redo():undo();else if(!settle())magnet();g=null;mt=null}return}
  if(!g)return;const mv=Math.hypot(p.x-g.x0,p.y-g.y0),quick=now-g.t0<350;
- if(g.m==='stroke'&&S.live){if(T.stab>0)addPt(g.rx,g.ry);touch();const st=S.live;S.strokes.push(st);S.live=null;S.pm=[];icAdd(st);commit()}
+ if(g.m==='stroke'&&S.live){if(T.stab>0)addPt(g.rx,g.ry);if(g.h){hsUpd();hsFin(S.live)}touch();const st=S.live;S.strokes.push(st);S.live=null;S.pm=[];icAdd(st);commit()}
  else if(g.m==='erase'){if(T.er.mode==='stroke'){const del=S.strokes.filter(s=>s.dim);if(del.length){touch();S.strokes=S.strokes.filter(s=>!s.dim)}}commit();S.inkV++}
  else if(g.m==='conn'){mmEnd(g,p)}
  else if(g.m==='lasso')lqPick();else if(g.m==='lmove')lqEnd(g);
@@ -69,7 +69,7 @@ function draw(){S.raf=0;S.fr++;pgUpd();const d=DPR(stage.clientWidth,stage.clien
  if(big){let ic=S.ic;const ok=ic&&ic.v===S.inkV&&ic.w===c1.width&&ic.h===c1.height,fits=ok&&Math.abs(s/ic.s-1)<1e-4&&Math.abs(d*(x-ic.x))<=ic.mx&&Math.abs(d*(y-ic.y))<=ic.my;
   if(!(fits||(ok&&mvg))){icBuild(c1.width,c1.height,d);ic=S.ic}const kk=s/ic.s;x1.setTransform(kk,0,0,kk,d*(x-kk*ic.x)-kk*ic.mx,d*(y-kk*ic.y)-kk*ic.my);x1.drawImage(ic.cv,0,0);used=true;if(mvg){clearTimeout(S.mt);S.mt=setTimeout(req,140)}}
  x1.setTransform(d*s,0,0,d*s,d*x,d*y);
- if(!used)for(const st of S.strokes){const b=bb(st);if(b[2]<vx||b[0]>vx+vw||b[3]<vy||b[1]>vy+vh)continue;drawStroke(x1,st)}if(S.live)drawStroke(x1,S.pm&&S.pm.length?{...S.live,p:S.live.p.concat(S.pm)}:S.live);lqGhost();
+ if(!used)for(const st of S.strokes){const b=bb(st);if(b[2]<vx||b[0]>vx+vw||b[3]<vy||b[1]>vy+vh)continue;drawStroke(x1,st)}if(S.live)drawStroke(x1,S.pm&&S.pm.length?{...S.live,p:S.live.p.concat(S.pm)}:S.live);lqGhost();hsGhost();
  if(S.guides.length){x1.strokeStyle=S.pr;x1.lineWidth=1.5/s;x1.beginPath();if(S.guides[0]!=null){x1.moveTo(S.guides[0],vy);x1.lineTo(S.guides[0],vy+vh)}if(S.guides[1]!=null){x1.moveTo(vx,S.guides[1]);x1.lineTo(vx+vw,S.guides[1])}x1.stroke()}
  x1.setTransform(d,0,0,d,0,0);const o=obj(S.sel);if(o&&!S.edit){const G=geo(o);x1.strokeStyle=S.pr;x1.fillStyle='#fff';x1.lineWidth=2;x1.setLineDash(o.lock?[6,5]:[]);x1.beginPath();G.q.forEach((p,i)=>i?x1.lineTo(p[0],p[1]):x1.moveTo(p[0],p[1]));x1.closePath();x1.stroke();x1.setLineDash([]);
   if(!o.lock){const dot=p=>{x1.beginPath();x1.arc(p[0],p[1],9,0,7);x1.fill();x1.stroke()};if(o.k!=='node'&&o.k!=='group'){x1.beginPath();x1.moveTo(G.t[0],G.t[1]);x1.lineTo(G.rot[0],G.rot[1]);x1.stroke();dot(G.rot)}if(o.k==='text')dot(G.e);else dot(G.se);if(o.k==='node'&&!(g&&g.m==='conn'&&g.dir))mmPlus(G.cn[mmSide(o)])}}lqDraw();mmOver();ghDraw();if(S.gh)req()}
@@ -91,9 +91,18 @@ function lqDraw(){const t=S.tr;if(!S.lp&&!S.lq)return;x1.save();x1.strokeStyle=S
  if(S.lq){const dm=g&&g.m==='lmove'&&g.dirty,f=lqBox(dm?g.dx:0,dm?g.dy:0);if(f){const e=8;rrect(x1,t.x+f[0]*t.s-e,t.y+f[1]*t.s-e,(f[2]-f[0])*t.s+2*e,(f[3]-f[1])*t.s+2*e,10);x1.stroke()}}x1.restore()}
 /* bản dời của các nét đang kéo (nét gốc mờ đi nhờ dim) */
 function lqGhost(){if(!g||g.m!=='lmove'||!g.dirty||!S.lq)return;x1.save();x1.translate(g.dx,g.dy);for(const s of S.lq.s)drawStroke(x1,{...s,dim:0});x1.restore()}
-function lqMove(x,y){const[wx,wy]=W2(x,y);if(!g.dirty){if(Math.hypot(x-g.x0,y-g.y0)<4)return;touch();g.dirty=1;g.o0=S.lq.o.map(id=>{const o=obj(id);return o&&[id,o.x,o.y]}).filter(Boolean);S.lq.s.forEach(s=>s.dim=1)}
+function lqMove(x,y){const[wx,wy]=W2(x,y);if(!g.dirty){if(Math.hypot(x-g.x0,y-g.y0)<4)return;touch();g.dirty=1;g.o0=S.lq.o.map(id=>{const o=obj(id);return o&&[id,o.x,o.y]}).filter(Boolean);S.lq.s.forEach(s=>s.dim=1);g.lg=g.o0.map(([id])=>{const e=els.get(id);if(!e)return null;const c=e.cloneNode(true);c.classList.remove('born');c.style.opacity=(+e.style.opacity||1)*.4;c.style.pointerEvents='none';world.insertBefore(c,e);return c}).filter(Boolean)}
  const dx=wx-g.p0[0],dy=wy-g.p0[1];g.dx=dx;g.dy=dy;for(const[id,ox,oy]of g.o0){const o=obj(id);o.x=ox+dx;o.y=oy+dy;renderObjs(o)}}
 /* thả: nét đổi sang bản mới (không sửa tại chỗ), đối tượng đã dời trực tiếp */
-function lqEnd(gg){if(!gg.dirty){S.lq=null;bar();return}const set=new Set(S.lq.s),ns=[],dx=gg.dx,dy=gg.dy;S.strokes=S.strokes.map(s=>{if(!set.has(s))return s;s.dim=0;const n={...s,p:s.p.map((v,i)=>v+(i%2?dy:dx)),dim:0};delete n.b;ns.push(n);return n});S.lq.s=ns;S.inkV++;commit()}
-function lqRev(gg){if(!gg.dirty)return;for(const[id,ox,oy]of gg.o0){const o=obj(id);if(o){o.x=ox;o.y=oy;renderObjs(o)}}S.lq.s.forEach(s=>s.dim=0);S.pre=null;S.inkV++}
+/* bỏ bản mờ vị trí cũ của đối tượng */
+function lqUng(gg){(gg.lg||[]).forEach(c=>c.remove());gg.lg=null}
+function lqEnd(gg){lqUng(gg);if(!gg.dirty){S.lq=null;bar();return}const set=new Set(S.lq.s),ns=[],dx=gg.dx,dy=gg.dy;S.strokes=S.strokes.map(s=>{if(!set.has(s))return s;s.dim=0;const n={...s,p:s.p.map((v,i)=>v+(i%2?dy:dx)),dim:0};delete n.b;ns.push(n);return n});S.lq.s=ns;S.inkV++;commit()}
+function lqRev(gg){lqUng(gg);if(!gg.dirty)return;for(const[id,ox,oy]of gg.o0){const o=obj(id);if(o){o.x=ox;o.y=oy;renderObjs(o)}}S.lq.s.forEach(s=>s.dim=0);S.pre=null;S.inkV++}
 function lqDel(){const q=S.lq;if(!q)return;touch();const ss=new Set(q.s),oo=new Set(q.o);S.strokes=S.strokes.filter(s=>!ss.has(s));S.objs=S.objs.filter(o=>!oo.has(o.id));S.edges=S.edges.filter(e=>!oo.has(e.a)&&!oo.has(e.b));S.lq=null;S.inkV++;commit();renderObjs();bar();req()}
+/* Bút nhấn: nét gần thẳng ngang/dọc thì hít nhẹ và hiện bản thẳng mờ; thả tay thì thành đường thẳng. Lệch ra khỏi hành lang thì tự bỏ; hoàn tác ngay nét đã hít = từ chối: thu hẹp ngưỡng, bỏ hít nét kế, 3 lần thì tắt trong phiên (S.hr, S.hk, S.hsn chỉ trong phiên, không lưu) */
+const hsK=()=>Math.max(0,1-.35*(S.hr||0));
+function hsInit(x,y){if(S.hsn){S.hr=Math.max(0,(S.hr||0)-.5);S.hsn=null}if(S.hk){S.hk=0;return}if(hsK()<=0)return;g.h={x,y,dx:0,dy:0,i:0,o:null}}
+function hsUpd(){const h=g.h,p=S.live.p,s=S.tr.s,k=hsK(),n=p.length;for(let i=h.i;i<n;i+=2){h.dx=Math.max(h.dx,Math.abs(p[i]-h.x));h.dy=Math.max(h.dy,Math.abs(p[i+1]-h.y))}h.i=n;
+ const rx=Math.abs(p[n-2]-h.x)*s,ry=Math.abs(p[n-1]-h.y)*s;let o=null;if(rx>=48&&rx>=ry&&h.dy*s<=(5+.03*rx)*k)o='h';else if(ry>=48&&ry>rx&&h.dx*s<=(5+.03*ry)*k)o='v';if(o&&!h.o)hap();h.o=o;h.ex=o==='h'?p[n-2]:h.x;h.ey=o==='v'?p[n-1]:h.y}
+function hsFin(st){const h=g.h;if(!h||!h.o)return;const d=Math.hypot(h.ex-h.x,h.ey-h.y),k=Math.max(1,Math.ceil(d/(6/S.tr.s))),p=[h.x,h.y];for(let i=1;i<=k;i++)p.push(h.x+(h.ex-h.x)*i/k,h.y+(h.ey-h.y)*i/k);st.p=p;S.hsn={st,t:performance.now()}}
+function hsGhost(){const h=g&&g.m==='stroke'&&g.h;if(!h||!h.o||!S.live)return;x1.save();x1.globalAlpha=.22;x1.globalCompositeOperation='multiply';x1.strokeStyle=S.live.c;x1.lineWidth=S.live.w;x1.lineCap='butt';x1.beginPath();x1.moveTo(h.x,h.y);x1.lineTo(h.ex,h.ey);x1.stroke();x1.restore()}
