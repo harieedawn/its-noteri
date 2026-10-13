@@ -83,7 +83,10 @@ Muốn sửa gì thì chỉ mở đúng file chứa nó (dùng `grep -n tên js/
 - Giới hạn kéo trang tính theo kích thước trang (không theo mức zoom) để khoảng trống kéo được bằng nhau ở mọi mức zoom. Zoom nhỏ nhất của PDF là 0.3 lần mức vừa chiều rộng.
 - Chạm hai ngón = hoàn tác, ba ngón = làm lại.
 - Màn hình chính: lưới 1 đến 5 cột chụm ngón để đổi, mỗi thư mục nhớ mức riêng; mục có thể thu gọn. Không có mục "Gần đây". Thư mục lồng nhau, có biểu tượng riêng.
-- Cài đặt không có mục Giới thiệu và không có nhật ký "Có gì mới". Phiên bản (`VER`, hiện 1.0) chỉ hiện là dòng chữ nhỏ mờ ở góc dưới phải của Cài đặt.
+- Chế độ ngang trên điện thoại (chiều cao <= 520px): chỉ chỉnh bằng khối CSS cuối `css/app.css` (thanh mỏng hơn, hộp thoại rộng hơn, bảng bút/sơ đồ chia 2 cột); không đổi hành vi.
+- Biểu tượng ổ khóa theo trạng thái: đang khóa là ổ khóa đóng (`lk`), chưa khóa là ổ khóa mở (`ul`); nhãn/aria-label vẫn là hành động (Khóa / Mở khóa).
+- Chủ đề: Sáng, Xám, Tối, và "Thêm" gồm các màu có sẵn (`TH`) cùng một mục tự chọn `custom` (`T.cu={h,s,d}`: màu, độ ngả nền, sáng/tối). `cuTh` tự phối cả bảng màu theo OKLCH, thanh chọn màu là các khối phẳng (không gradient), không dùng bộ chọn màu của hệ thống.
+- Cài đặt không có mục Giới thiệu và không có nhật ký "Có gì mới". Phiên bản (`VER`, hiện 1.1) chỉ hiện là dòng chữ nhỏ mờ ở góc dưới phải của Cài đặt.
 
 - Thanh công cụ: chọn Con trỏ thì thu gọn còn một nút ở giữa (chạm lại để mở rộng). Cả 8 nút luôn nằm trong DOM; thu gọn chỉ là thêm lớp `.cp` và CSS co độ rộng các nút còn lại về 0 (có hiệu ứng, nút Con trỏ nảy nhẹ; mở rộng thì các nút hiện lần lượt). Không dựng lại nút mỗi lần gọi `tools()`, nếu không sẽ mất hiệu ứng. Lần đầu mở trình soạn dùng lớp `.nt` để không chạy hiệu ứng. Khi bảng của công cụ (bút, tẩy, sơ đồ) đang mở, chạm vào trang chỉ đóng bảng, không vẽ.
 - Tạo nút sơ đồ hoặc hộp chữ rồi thoát/đóng bàn phím mà chưa nhập gì thì hủy việc tạo (không để lại nút rỗng). Nhóm mới tạo cũng vậy: tên bắt buộc.
