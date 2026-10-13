@@ -86,9 +86,11 @@ Muốn sửa gì thì chỉ mở đúng file chứa nó (dùng `grep -n tên js/
 - Chế độ ngang trên điện thoại (chiều cao <= 520px): chỉ chỉnh bằng khối CSS cuối `css/app.css` (thanh mỏng hơn, hộp thoại rộng hơn, bảng bút/sơ đồ chia 2 cột); không đổi hành vi.
 - Biểu tượng ổ khóa theo trạng thái: đang khóa là ổ khóa đóng (`lk`), chưa khóa là ổ khóa mở (`ul`); nhãn/aria-label vẫn là hành động (Khóa / Mở khóa).
 - Chủ đề: Sáng, Xám, Tối, và "Thêm" gồm các màu có sẵn (`TH`) cùng một mục tự chọn `custom` (`T.cu={h,s,d}`: màu, độ ngả nền, sáng/tối). `cuTh` tự phối cả bảng màu theo OKLCH, thanh chọn màu là các khối phẳng (không gradient), không dùng bộ chọn màu của hệ thống.
-- Cài đặt không có mục Giới thiệu và không có nhật ký "Có gì mới". Phiên bản (`VER`, hiện 1.1) chỉ hiện là dòng chữ nhỏ mờ ở góc dưới phải của Cài đặt.
+- Cài đặt không có mục Giới thiệu và không có nhật ký "Có gì mới". Phiên bản (`VER`, hiện 1.2) chỉ hiện là dòng chữ nhỏ mờ ở góc dưới phải của Cài đặt.
 
 - Thanh công cụ: chọn Con trỏ thì thu gọn còn một nút ở giữa (chạm lại để mở rộng). Cả 8 nút luôn nằm trong DOM; thu gọn chỉ là thêm lớp `.cp` và CSS co độ rộng các nút còn lại về 0 (có hiệu ứng, nút Con trỏ nảy nhẹ; mở rộng thì các nút hiện lần lượt). Không dựng lại nút mỗi lần gọi `tools()`, nếu không sẽ mất hiệu ứng. Lần đầu mở trình soạn dùng lớp `.nt` để không chạy hiệu ứng. Khi bảng của công cụ (bút, tẩy, sơ đồ) đang mở, chạm vào trang chỉ đóng bảng, không vẽ.
+- Kéo thanh công cụ: đè nút Con trỏ khoảng 0,2 giây rồi kéo để đặt thanh ở đâu cũng được (trong vùng trang, không đè thanh trên); kéo sát cạnh trái/phải thì hiện ô xem trước, thả ra thì thanh chuyển sang dạng đứng (lớp `.tv`, `.tvl`/`.tvr`). Vị trí `TBP` chỉ giữ trong phiên, không lưu vào dữ liệu; chưa từng kéo thì giữ nguyên vị trí mặc định (giữa, sát đáy). Mã ở cuối `js/08-tools-mindmap.js` (`tbHold`, `tbDrag`, `tbApply`). Chế độ ngang trên điện thoại: nút thanh công cụ 34px.
+- Toàn màn hình: `manifest.webmanifest` dùng `display:fullscreen` (kèm `display_override` lùi về standalone) để ẩn thanh trạng thái khi cài như ứng dụng; chỉ có tác dụng sau khi gỡ và cài lại PWA, và chỉ trên Android/Chrome. Không gọi Fullscreen API trong mã.
 - Tạo nút sơ đồ hoặc hộp chữ rồi thoát/đóng bàn phím mà chưa nhập gì thì hủy việc tạo (không để lại nút rỗng). Nhóm mới tạo cũng vậy: tên bắt buộc.
 - Mọi loại chữ trong trang (hộp chữ, ghi chú, nút, tên nhóm) chỉ sửa bằng nhấn đúp. Hít chữ vào kẻ phải nhẹ, chỉ theo trục ngang của dòng kẻ, không hít mạnh.
 
